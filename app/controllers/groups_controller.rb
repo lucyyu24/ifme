@@ -24,6 +24,7 @@ class GroupsController < ApplicationController
   def show
   	@group = Group.find(params[:id])
   	@page_title = @group.name
+    @page_new = new_meeting_path
   	@meetings = Meeting.where(groupid: @group.id).order('created_at DESC')
   	@group_leaders = GroupMember.where(groupid: @group.id, leader: true).all
   end
@@ -130,25 +131,6 @@ class GroupsController < ApplicationController
         format.html { redirect_to groups_path, notice: 'You have left ' + group_name }
         format.json { head :no_content }
       end
-    end
-  end
-
-  # DELETE /groups/1
-  # DELETE /groups/1.json
-  def destroy
-    # Remove groups from existing triggers
-    @triggers = Trigger.where(:userid => current_user.id).all
-
-    @triggers.each do |item|
-      new_group = item.groups.delete(@group.id)
-      the_trigger = Trigger.find_by(id: item.id)
-      the_trigger.update(groups: item.groups)
-    end
-
-    @group.destroy
-    respond_to do |format|
-      format.html { redirect_to groups_path }
-      format.json { head :no_content }
     end
   end
 

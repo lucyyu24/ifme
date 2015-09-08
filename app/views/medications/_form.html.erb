@@ -1,88 +1,62 @@
-<script type="text/javascript">
-  $(document).ready(function() {
-
-    function toTitleCase(str) {
-      if (1 !== str.length) str = str.toLowerCase();
-      return str.replace(/\b[a-z]/g, function(f){return f.toUpperCase()});
-    }
-
-    $("#medication_name").autocomplete({
-      source: function (request, response) {
-      $.getJSON(
-        "http://dailymed.nlm.nih.gov/dailymed/services/v2/drugnames.json?drug_name=" + request.term,
-        function (data) {
-          var cleanedData = [];
-          _.each(data.data, function(dataItem) {
-            cleanedData.push(toTitleCase(dataItem.drug_name));
-          })
-          response(cleanedData);
-        });
-      },
-      minLength: 3,
-      select: function (event, ui) {
-        var selectedObj = ui.item;
-        $("#medication_name").val(selectedObj.value);
-          return false;
-      },
-      open: function () {
-        $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
-      },
-      close: function () {
-        $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
-      }
-    });
-    $("#medication_name").autocomplete("option", "delay", 100);
-    $("#medication_refill").datepicker();
-  });
-</script>
-
 <%= form_for(@medication) do |f| %>
-  <% if @medication.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@medication.errors.count, "error") %> prohibited this medication from being saved:</h2>
+<% if @medication.errors.any? %>
+<div id="error_explanation">
+  <h2><%= pluralize(@medication.errors.count, "error") %> prohibited this medication from being saved:</h2>
 
-      <ul>
-      <% @medication.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <ul>
+    <% @medication.errors.full_messages.each do |message| %>
+    <li><%= message %></li>
+    <% end %>
+  </ul>
+</div>
+<% end %>
 
 <div class="table">
-  <div class="table_cell" style="padding-left: 200px; width:500px">
+
+  <div class="table_cell padding_right vertical_align">
+
     <div class="field" >
-      <%= f.text_field :name, :placeholder => "Name", :class => "nameFormTextbox", :style=>"width:80%"%>
+      <%= f.text_field :name, :placeholder => "Name", :class => "name_field" %>
     </div>
+
     <div class="field">
-      <%= f.text_area :comments, :placeholder => "Comments", :class => "commentsTextarea", :style=>"width:80%; height:150px" %>
+      <%= f.text_area :comments, :placeholder => "Comments", :class => "comments" %>
     </div>
+
   </div>
 
+  <div class="table_cell vertical_align padding_right">
 
-  <div class="table_cell" style="padding-right: 200px; width:150px">
-    <div class="medicationField">
+    <div class="field">
       <%= f.number_field :strength, :placeholder => "Strength (e.g. 100)"%>
-      <div style="float:right"><%= f.select(:strength_unit, [['mg', 'mg'], ['ml', 'ml']]) %></div>
+      <%= f.select(:strength_unit, [['mg', 'mg'], ['ml', 'ml']]) %>
     </div>
-    <div class="medicationField">
+
+    <div class="field">
       <%= f.number_field :total, :placeholder => "Total Quantity (e.g. 30)" %>
-      <div style="float:right"><%= f.select(:total_unit, [['tablets', 'tablets'], ['mg', 'mg'], ['ml', 'ml']]) %></div>
+      <%= f.select(:total_unit, [['tablets', 'tablets'], ['mg', 'mg'], ['ml', 'ml']]) %>
     </div>
-    <div class="medicationField">
+
+    <div class="field">
       <%= f.number_field :dosage, :placeholder => "Daily Dosage (e.g. 2)" %>
-      <div style="float:right"><%= f.select(:dosage_unit, [['tablets', 'tablets'], ['mg', 'mg'], ['ml', 'ml']]) %></div>
+      <%= f.select(:dosage_unit, [['tablets', 'tablets'], ['mg', 'mg'], ['ml', 'ml']]) %>
     </div>
-    <div class="medicationField">
+
+  </div>
+
+  <div class="table_cell vertical_align">
+
+    <div class="field">
       <%= f.text_field :refill, :placeholder => "Refill Time" %>
     </div>
 
-    <br/><br/>
-    <div class="actions" style="float:right">
+    <div class="actions">
       <%= f.hidden_field :userid, :value => current_user.id %>
       <%= f.submit %>
     </div>
-  
+
   </div>
+
+</div>
 
 <% end %>
